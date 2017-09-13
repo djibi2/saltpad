@@ -41,7 +41,13 @@ export function GetJobDetails(job_id) {
 }
 
 export function JobReturn(job_id, job) {
-    store.set(['jobs', job_id], JobEventToJobStore(job.data));
+    let path = ['jobs', job_id];
+    let job_to_store = JobEventToJobStore(job.data);
+    if(store.exists(path)) {
+        store.merge(path, job_to_store);
+    } else {
+        store.set(path, job_to_store);
+    }
 }
 
 export function UpdateModuleFunctionList(job_id, minion, job) {
@@ -56,7 +62,7 @@ export function UpdateModuleFunctionList(job_id, minion, job) {
 
 export function UpdateModuleFunctionDoc(job_id, minion, job) {
     if(job.data['fun'] == 'sys.doc') {
-        _.map(_.pairs(job.data.return), ([moduleFunctionName, moduleFunctionDoc]) => {
+        _.map(_.toPairs(job.data.return), ([moduleFunctionName, moduleFunctionDoc]) => {
             store.set(['moduleFunctions', moduleFunctionName, 'doc'], moduleFunctionDoc);
         });
     }
@@ -64,7 +70,7 @@ export function UpdateModuleFunctionDoc(job_id, minion, job) {
 
 export function UpdateModuleFunctionArgSpec(job_id, minion, job) {
     if(job.data['fun'] == 'sys.argspec') {
-        _.map(_.pairs(job.data.return), ([moduleFunctionName, moduleFunctionArgspec]) => {
+        _.map(_.toPairs(job.data.return), ([moduleFunctionName, moduleFunctionArgspec]) => {
             store.set(['moduleFunctions', moduleFunctionName, 'argspec'], ArgSpecParser(moduleFunctionArgspec));
         });
     }
@@ -89,6 +95,18 @@ export function RunJob(matcher, minions, module_function, args, add_to_runned_jo
                     store.set(['session', 'runned_jobs'], []);
                 }
                 store.apply(['session', 'runned_jobs'], _.partial(last10, job_id));
+            }
+
+            // Add to store informations we have
+            let job = {Function: module_function, jid: job_id,
+                       Target: minions, Arguments: args,
+                       'Target-type': matcher}
+
+            let path = ['jobs', job_id]
+            if(store.exists(path)) {
+                store.merge(path, job);
+            } else {
+                store.set(path, job);
             }
 
             return job_id;

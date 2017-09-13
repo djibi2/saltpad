@@ -9,10 +9,10 @@ var RunnerJobEventToJobStore = function(job) {
 
 export var JobEventToJobStore = function(job) {
     let new_job = {'Function': job['fun'], 'jid': job['jid'], 'User': job['user'],
-                   'StartTime': moment(job['_stamp']).unix(), 'Target': job['tgt'],
+                   'StartTime': moment(job['_stamp'], moment.ISO_8601).unix(), 'Target': job['tgt'],
                    'Target-type': job['tgt_type'], 'Arguments': ArgParser(job['arg']),
                    'Minions': job['minions'], 'Return': job['return']}
-    return _.omit(new_job, _.isUndefined);
+    return _.omitBy(new_job, _.isUndefined);
 }
 
 export var ArgSpecParser = function(argspec) {
@@ -26,7 +26,7 @@ export var ArgSpecParser = function(argspec) {
 
 export function ArgFormatter(args) {
     let [poargs, kwargs] = args;
-    let formatted_kwargs = _.map(_.pairs(kwargs), ([arg_key, arg_value]) => {
+    let formatted_kwargs = _.map(_.toPairs(kwargs), ([arg_key, arg_value]) => {
         return {__kwarg__: true, [arg_key]: arg_value}
     });
     return _.union(poargs, formatted_kwargs);
@@ -57,7 +57,7 @@ export var HighstateStatusLabel = {"Error": "danger", "Dependency failed": "dang
                                    "Changes": "info", "Success": "success"}
 
 export function HighstateReturnParser(jobReturn) {
-    let grouped_chunks = _.groupBy(_.pairs(jobReturn), (chunk) => {
+    let grouped_chunks = _.groupBy(_.toPairs(jobReturn), (chunk) => {
         if (_.get(chunk[1], 'comment', '').includes('requisite failed')) {
             return "Dependency failed";
         }

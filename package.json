@@ -11,10 +11,10 @@
     "react-dom": "^0.14.5",
     "react-router": "^1.0.3",
     "history": "^1.17.0",
-    "lodash": "",
-    "baobab": "",
-    "axios": "",
-    "urijs": ""
+    "lodash": "^4.4.0",
+    "baobab": "^2.3.3",
+    "axios": "^0.9.1",
+    "urijs": "^1.17.0"
   },
   "devDependencies": {
     "babel": "^5.6.14",
@@ -33,7 +33,7 @@
     "react-transform-hmr": "^1.0.1",
     "redbox-react": "^1.2.0",
     "react-bootstrap-table": "^1.4.0",
-    "react-select": "1.0.0-beta6",
+    "react-select": "1.0.0-beta8",
     "react-mixin": "",
     "react-addons-linked-state-mixin": "",
     "baobab-react": "",
@@ -46,7 +46,6 @@
     "style-loader": "",
     "url-loader": "",
     "file-loader": "",
-    "mapify": "",
     "bower": "",
     "moment": "",
     "rimraf": "^2.4.3",
@@ -63,7 +62,7 @@
   "scripts": {
     "clean": "rimraf dist && rimraf dist.zip",
     "build:webpack": "NODE_ENV=production ./node_modules/webpack/bin/webpack.js --config webpack.config.prod.js",
-    "build": "npm run clean && npm run build:webpack && zip -j -r dist.zip dist/* && md5sum dist.zip > dist.zip.md5 && sha1sum dist.zip > dist.zip.sha1",
+    "build": "npm run clean && npm run build:webpack && zip -r dist.zip dist/* && md5sum dist.zip > dist.zip.md5 && sha1sum dist.zip > dist.zip.sha1",
     "start": "node devServer.js",
     "playground": "node devServer.js --env playground",
     "lint": "eslint src"

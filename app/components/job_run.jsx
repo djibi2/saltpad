@@ -11,6 +11,7 @@ import {HidingPanel} from './shared/hiding';
 import {If} from './shared/templates';
 import JobsService from '../jobs/services';
 import {RunJob} from '../jobs/actions';
+import gen_path from '../path_utils';
 
 class MatcherSelect extends React.Component {
 
@@ -66,15 +67,35 @@ class FunctionSelect extends React.Component {
 
   render() {
 
+    var fonctions = this.props.functions;
+
+    var async_options = (input, callback) => {
+        let options = _.filter(fonctions, (fonction) => _.includes(fonction.value, input));
+        callback(null, {
+            options: options,
+            // CAREFUL! Only set this to true when there are no more options,
+            // or more specific queries will not be sent to the server.
+            complete: false
+        });
+    }
+
+    if(this.props.function === undefined) {
+        var value = undefined;
+    } else {
+        var value = {label: this.props.function, value: this.props.function};
+    }
+
+    console.log("Function", value);
+
     return (
       <div className="form-group">
         <label htmlFor="form-function-name" className="col-sm-2 control-label">Function</label>
         <div className="col-sm-10">
-          <Select
+          <Select.Async
               name="form-function-name"
-              options={this.props.functions}
-              searchable={true}
-              value={this.props.function}
+              loadOptions={async_options}
+              minimumInput={3}
+              value={value}
               onChange={this.props.functionChanger}
           />
           <span className="help-block">
@@ -143,7 +164,7 @@ class JobArguments extends React.Component {
       return <JobArgInput arg_name={arg_name} key={arg_name} arg_value={_.get(form_state, arg_name)} ArgumentChanger={ArgumentChanger(arg_name)} />;
     });
 
-    let optional_inputs = _.map(_.pairs(optional), ([arg_name, arg_value]) => {
+    let optional_inputs = _.map(_.toPairs(optional), ([arg_name, arg_value]) => {
       return <JobArgInput arg_name={arg_name} arg_value={_.get(form_state, arg_name, arg_value)} key={arg_name} ArgumentChanger={ArgumentChanger(arg_name)} />;
     });
 
@@ -189,7 +210,7 @@ class JobRun extends React.Component {
         RunJob(state.matcher, state.target, state.moduleFunction, [[], state.arguments])
           .then(job_id => {
             if(job_id) {
-              this.context.history.pushState(null, `/job_result/${job_id}`, null);
+              this.context.history.pushState(null, gen_path(`/job_result/${job_id}`), null);
             }
           });
     }
@@ -212,7 +233,7 @@ class JobRun extends React.Component {
           return {value: minion, label: minion}
       });
 
-      var moduleFunctions = _.map(_.pairs(this.props.moduleFunctions), ([module_name, _]) => {
+      var moduleFunctions = _.map(_.toPairs(this.props.moduleFunctions), ([module_name, _]) => {
           return {value: module_name, label: module_name}
       });
       var moduleFunctions = _.sortBy(moduleFunctions, (module_name) => module_name.value);

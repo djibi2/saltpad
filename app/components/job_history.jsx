@@ -5,11 +5,12 @@ import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import {ReactBootstrapTableStyle} from '../../node_modules/react-bootstrap-table/css/react-bootstrap-table.min.css';
 import moment from 'moment';
 import { Link } from 'react-router';
+import gen_path from '../path_utils';
 
 class JobHistory extends React.Component {
     render() {
 
-      var jobs = _.pairs(this.props.jobs)
+      var jobs = _.toPairs(this.props.jobs)
       jobs = _.sortBy(jobs, (job) => -1 * job[0]);
       jobs = _.map(jobs, (job) => job[1]);
 
@@ -22,7 +23,7 @@ class JobHistory extends React.Component {
       }
 
       function JidOutputLink(jid, job){
-        let link = `/job_result/${jid}`;
+        let link = gen_path(`/job_result/${jid}`);
         return <Link to={link}>Output</Link>;
       }
 
